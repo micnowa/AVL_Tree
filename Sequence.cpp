@@ -1,5 +1,5 @@
 //
-// Created by micha on 17.10.2018.
+// Created by Michał on 17.10.2018.
 //
 
 #include "List.cpp"
@@ -28,6 +28,4 @@ public:
     void setInfos(const List<a1> &infos) {
         Sequence::infos = infos;
     }
-
-
 };

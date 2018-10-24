@@ -12,86 +12,55 @@ public:
 
     ~List();
 
-    /* Modifiers */
     void push_back(T &&data);
 
     void push_back(T const &data);
-
-    void push_front(T &&data);
-
-    void push_front(T const &data);
 
     void pop_back();
 
     void pop_front();
 
-    void swap(List &x);
+    void swap(List &that);
 
     void clear();
 
-    /* Iterators */
-    typedef T *iterator;
-    typedef T *const const_iterator;
-
-    const_iterator begin() const; // cbegin
-    iterator begin();
-
-    const_iterator end() const; //cend()
-    iterator end();
-
-    const_iterator rbegin() const;
-
-    iterator rbegin();
-
-    const_iterator rend() const;
-
-    iterator rend();
-
-    /* Capacity */
     size_t size() const;
 
     bool empty() const;
 
-    /* Element Access */
     T &front();
 
     T const &front() const;
 
-    T &back();
+    T &get_last();
 
-    T const &back() const;
+    T const &get_last() const;
 
-    T &at(T const indx);
+    T &at(T index);
 
-    T const &at(T const indx) const;
+    T const &at(T index) const;
 
-    T &operator[](T const indx);
+    T &operator[](T index);
 
-    T const &operator[](T const indx) const;
+    T const &operator[](T index) const;
 
 private:
-    struct node {
-        T key;
-        T info;
-        node *next, *prev;
+    struct Element {
+        T data;
+        Element *next;
 
-        node(T const &data, node *next, node *prev)
-                : key(data), next(next), prev(prev) {
-        }
+        Element(T const &data, Element *next) : data(data), next(next) {}
 
-        node(T &&data, node *next, node *prev)
-                : key(std::move(data)), next(next), prev(prev) {
-        }
+        Element(T &&data, Element *next) : data(std::move(data)), next(next) {}
     };
-
-    int elements = 0;
-    node *head = nullptr;
-    node *tail = nullptr;
+    size_t elements = 0;
+    Element *head = nullptr;
+    Element *tail = nullptr;
 };
 
 template<typename T>
 List<T> &List<T>::operator=(const List<T> &that) {
-    node *tmp = head;
+    Element *tmp;
     while (head) {
         tmp = head;
         head = head->next;
@@ -104,7 +73,7 @@ List<T> &List<T>::operator=(const List<T> &that) {
 
 template<typename T>
 List<T>::~List() {
-    node *tmp;
+    Element *tmp;
     while (head) {
         tmp = head;
         head = head->next;
@@ -116,34 +85,34 @@ List<T>::~List() {
 template<typename T>
 T &List<T>::front() {
     if (head == nullptr)
-        throw std::runtime_error("Invalid Action!");
-    return head->key;
+        throw std::runtime_error("List is empty ...");
+    return head->data;
 }
 
 template<typename T>
 T const &List<T>::front() const {
     if (head == nullptr)
         throw std::runtime_error("Invalid Action!");
-    return head->key;
+    return head->data;
 }
 
 template<typename T>
-T &List<T>::back() {
+T &List<T>::get_last() {
     if (tail == nullptr)
-        throw std::runtime_error("Invalid Action!");
-    return tail->key;
+        throw std::runtime_error("List is empty ...");
+    return tail->data;
 }
 
 template<typename T>
-T const &List<T>::back() const {
+T const &List<T>::get_last() const {
     if (tail == nullptr)
-        throw std::runtime_error("Invalid Action!");
-    return tail->key;
+        throw std::runtime_error("List is empty ...");
+    return tail->data;
 }
 
 template<typename T>
 void List<T>::push_back(T const &data) {
-    node *newNode = new node(data, nullptr, tail);
+    Element *newNode = new Element(data, nullptr);
     if (head == nullptr)
         head = newNode;
     if (tail != nullptr)
@@ -154,7 +123,7 @@ void List<T>::push_back(T const &data) {
 
 template<typename T>
 void List<T>::push_back(T &&data) {
-    node *newNode = new node(std::move(data), nullptr, tail);
+    Element *newNode = new Element(std::move(data), nullptr);
     if (head == nullptr)
         head = newNode;
     if (tail != nullptr)
@@ -163,36 +132,13 @@ void List<T>::push_back(T &&data) {
     ++elements;
 }
 
-template<typename T>
-void List<T>::push_front(T const &data) {
-    node *newNode = new node(data, head, nullptr);
-    if (tail == nullptr)
-        tail = newNode;
-    if (head != nullptr)
-        head->prev = newNode;
-    head = newNode;
-    ++elements;
-}
-
-template<typename T>
-void List<T>::push_front(T &&data) {
-    node *newNode = new node(data, head, nullptr);
-    if (tail == nullptr)
-        tail = newNode;
-    if (head != nullptr)
-        head->prev = newNode;
-    head = newNode;
-    ++elements;
-}
 
 template<typename T>
 void List<T>::pop_front() {
     if (head == nullptr)
         throw std::runtime_error("Invalid Action");
-    node *tmp = head;
+    Element *tmp = head;
     head = head->next;
-    if (head != nullptr)
-        head->prev = nullptr;
     --elements;
     delete tmp;
 }
@@ -201,7 +147,7 @@ template<typename T>
 void List<T>::pop_back() {
     if (tail == nullptr)
         throw std::runtime_error("Invalid Action");
-    node *tmp = tail;
+    Element *tmp = tail;
     tail = tail->prev;
     if (tail != nullptr)
         tail->next = nullptr;
@@ -220,12 +166,12 @@ size_t List<T>::size() const {
 }
 
 template<typename T>
-T &List<T>::operator[](T const indx) {
+T &List<T>::operator[](T const index) {
     int cont = 0;
-    node *curr = head;
+    Element *curr = head;
     while (curr) {
-        if (cont == indx)
-            return curr->key;
+        if (cont == index)
+            return curr->data;
         curr = curr->next;
         ++cont;
     }
@@ -233,12 +179,12 @@ T &List<T>::operator[](T const indx) {
 }
 
 template<typename T>
-T const &List<T>::operator[](T const indx) const {
+T const &List<T>::operator[](T const index) const {
     int cont = 0;
-    node *curr = head;
+    Element *curr = head;
     while (curr) {
-        if (cont == indx)
-            return curr->key;
+        if (cont == index)
+            return curr->data;
         curr = curr->next;
         ++cont;
     }
@@ -246,70 +192,27 @@ T const &List<T>::operator[](T const indx) const {
 }
 
 template<typename T>
-T &List<T>::at(T const indx) {
+T &List<T>::at(T const index) {
     int cont = 0;
-    node *curr = head;
+    Element *curr = head;
     while (curr) {
-        if (cont == indx)
-            return curr->key;
+        if (cont == index)
+            return curr->data;
         curr = curr->next;
         cont++;
     }
-//    return (T)NULL;
 }
 
 template<typename T>
-T const &List<T>::at(T const indx) const {
+T const &List<T>::at(T const index) const {
     int cont = 0;
-    node *curr = head;
+    Element *curr = head;
     while (curr) {
-        if (cont == indx)
-            return curr->key;
+        if (cont == index)
+            return curr->data;
         curr = curr->next;
         cont++;
     }
-//    return (T) NULL;
-}
-
-template<typename T>
-typename List<T>::const_iterator List<T>::begin() const {
-    return head;
-}
-
-template<typename T>
-typename List<T>::iterator List<T>::begin() {
-    return head;
-}
-
-
-template<typename T>
-typename List<T>::const_iterator List<T>::end() const {
-    return tail;
-}
-
-template<typename T>
-typename List<T>::const_iterator List<T>::rbegin() const {
-    return tail;
-}
-
-template<typename T>
-typename List<T>::iterator List<T>::rbegin() {
-    return tail;
-}
-
-template<typename T>
-typename List<T>::const_iterator List<T>::rend() const {
-    return head;
-}
-
-template<typename T>
-typename List<T>::iterator List<T>::rend() {
-    return head;
-}
-
-template<typename T>
-typename List<T>::iterator List<T>::end() {
-    return tail;
 }
 
 template<typename T>
@@ -321,7 +224,7 @@ void List<T>::swap(List &that) {
 
 template<typename T>
 void List<T>::clear() {
-    node *curr = head;
+    Element *curr;
     while (head) {
         curr = head;
         head = head->next;
