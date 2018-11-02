@@ -5,33 +5,54 @@
 #include "List.cpp"
 
 /**
- *
+ * Data structure that is used as an list adaptor.
  * @tparam a0
  * @tparam a1
  */
 template <typename a0, typename a1>
 class Sequence {
 public:
-    List<a0> keys;
-    List<a1> infos;
+    /**
+     * list with keys and infos
+     */
+    List<a0, a1> list;
 
-    Sequence(const List<a0> &keys, const List<a1> &infos) : keys(keys), infos(infos) {}
+    /**
+     * Constructor with arguments
+     * @param elements elements
+     */
+    Sequence(const List<a0, a1> &elements) : list(elements) {}
 
+    /**
+     * Default constructor
+     */
     Sequence() = default;
 
-    const List<a0> &getKeys() const {
-        return keys;
+    /**
+     * Gets list
+     * @return list
+     */
+    const List<a0, a1> &getList() const {
+        return list;
     }
 
-    void setKeys(const List<a0> &keys) {
-        Sequence::keys = keys;
+    /**
+     * Sets list
+     * @param list list
+     */
+    void setList(const List<a0, a1> &list) {
+        Sequence::list = list;
     }
 
-    const List<a1> &getInfos() const {
-        return infos;
-    }
-
-    void setInfos(const List<a1> &infos) {
-        Sequence::infos = infos;
+    /**
+     * Returns info corresponding to key provided as the argument
+     * @param key key
+     * @return info associated with given key
+     */
+    a1 getInfo(a0 key) {
+        for (int i = 0; i < list.size(); ++i) {
+            if (list[i].getKey() == key) return list[i].getInfo();
+        }
+        return NULL;
     }
 };

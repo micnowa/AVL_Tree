@@ -6,28 +6,85 @@
 #include <stdexcept>
 
 /**
+ * Element of a list. Data structure used for holding data of type T.
+ * It has a pointer to another Element, so the list having access to
+ * header Element has the access to all elements.
+ */
+template<typename a0, typename a1>
+struct Element {
+    /**
+     * Key
+     */
+    a0 key;
+
+    /**
+     * Info
+     */
+    a1 info;
+
+    /**
+     * Pointer to another Element
+     */
+    Element *next;
+
+    /**
+     * Constructor with arguments
+     * @param dataKey key
+     * @param dataInfo info
+     * @param next pointer to the next Element
+     */
+    Element(a0 const &dataKey, a1 const &dataInfo, Element *next) : key(dataKey), info(dataInfo), next(next) {}
+
+    /**
+     * Constructor with arguments
+     * @param key key
+     * @param info info
+     * @param next pointer to next Element
+     */
+    Element(a0 &&key, a0 &&info, Element *next) : key(std::move(key)), info(std::move(info)), next(next) {}
+
+    /**
+     * Return key
+     * @return key
+     */
+    a0 getKey() const {
+        return key;
+    }
+
+    /**
+     * Returns info
+     * @return info
+     */
+    a1 getInfo() const {
+        return info;
+    }
+};
+
+
+/**
  * An ordered collection. This collection allows access to elements
  * by position, as well as control on where elements are inserted.
  * Unlike sets, duplicate elements are permitted by this general
  * contract (if a subclass forbids duplicates, this should be
  * documented).
- *
- * Each element of type T is kept in a structure Node<T>. Each node
+ * Each element of type T is kept in a structure Node<a0,a1>. Each node
  * holds an element T and a pointer pointing to a node. The list keeps
  * one node, called head, which has a pointer to another node, which
  * has a node to another node and so on. This allows list to have access
  * to each element.
- *
- * @tparam T type of elements of the list
+ * @tparam a0 type of elements of the list
  */
-template<typename T>
+template<typename a0, typename a1>
 class List {
+private:
+
+
 public:
     /**
      * Overwritten operator =
      * @return reference to the list
      */
-    List<T> &operator=(const List<T> &);
+    List<a0, a1> &operator=(const List<a0, a1> &);
 
     /**
      * Default destructor
@@ -35,16 +92,11 @@ public:
     ~List();
 
     /**
-     * Adds element to an end of the list
-     * @param data element to be added
+     * Adds an element with given key and info
+     * @param key key
+     * @param info info
      */
-    void push_back(T &&data);
-
-    /**
-     * Adds element to an end of the list
-     * @param data element to be added
-     */
-    void push_back(T const &data);
+    void push_back(a0 key, a1 info);
 
     /**
      * Clears the list destroying all its elements
@@ -67,74 +119,41 @@ public:
      * Returns first element of the list.
      * @return first element of the list
      */
-    T &front();
+    Element<a0, a1> &front();
 
     /**
      * Returns first element of the list.
      * @return first element of the list
      */
-    T const &front() const;
+    Element<a0, a1> const &front() const;
 
     /**
      * Returns element of given index.
      * @param index number of element to be returned
      * @return element of given index
      */
-    T &at(T index);
+    Element<a0, a1> &at(int index);
 
     /**
      * Returns element of given index.
      * @param index number of element to be returned
      * @return element of given index
      */
-    T const &at(T index) const;
+    Element<a0, a1> const &at(int index) const;
 
     /**
      * Overwritten operator []. Enables list to return object using arrays' notation
      * @param index number of element to be returned
      * @return element of given index
      */
-    T &operator[](T index);
+    Element<a0, a1> &operator[](int index);
 
     /**
      * Overwritten operator []. Enables list to return object using arrays' notation
      * @param index number of element to be returned
      * @return element of given index
      */
-    T const &operator[](T index) const;
-
-private:
-    /**
-     * Element of a list. Data structure used for holding data of type T.
-     * It has a pointer to another Element, so the list having access to
-     * header Element has the access to all elements.
-     */
-    struct Element {
-        /**
-         * Data object
-         */
-        T data;
-        /**
-         * Pointer to another Element
-         */
-        Element *next;
-
-        /**
-         * Constructor with arguments
-         *
-         * @param data data of Element
-         * @param next pointer to next Element
-         */
-        Element(T const &data, Element *next) : data(data), next(next) {}
-
-        /**
-         * Constructor with arguments
-         *
-         * @param data data of Element
-         * @param next pointer to next Element
-         */
-        Element(T &&data, Element *next) : data(std::move(data)), next(next) {}
-    };
+    Element<a0, a1> const &operator[](int index) const;
 
     /**
      * Size of the list, in other words number of elements
@@ -143,16 +162,16 @@ private:
     /**
      * Pointer to first element of the list
      */
-    Element *head = nullptr;
+    Element<a0, a1> *head = nullptr;
     /**
      * Pointer to last element of the list
      */
-    Element *tail = nullptr;
+    Element<a0, a1> *tail = nullptr;
 };
 
-template<typename T>
-List<T> &List<T>::operator=(const List<T> &that) {
-    Element *tmp;
+template<typename a0, typename a1>
+List<a0, a1> &List<a0, a1>::operator=(const List<a0, a1> &that) {
+    Element<a0, a1> *tmp;
     while (head) {
         tmp = head;
         head = head->next;
@@ -163,9 +182,9 @@ List<T> &List<T>::operator=(const List<T> &that) {
     tail = that.tail;
 }
 
-template<typename T>
-List<T>::~List() {
-    Element *tmp;
+template<typename a0, typename a1>
+List<a0, a1>::~List() {
+    Element<a0, a1> *tmp;
     while (head) {
         tmp = head;
         head = head->next;
@@ -174,34 +193,23 @@ List<T>::~List() {
 }
 
 
-template<typename T>
-T &List<T>::front() {
+template<typename a0, typename a1>
+Element<a0, a1> &List<a0, a1>::front() {
     if (head == nullptr)
         throw std::runtime_error("List is empty ...");
-    return head->data;
+    return *head;
 }
 
-template<typename T>
-T const &List<T>::front() const {
+template<typename a0, typename a1>
+Element<a0, a1> const &List<a0, a1>::front() const {
     if (head == nullptr)
         throw std::runtime_error("Invalid Action!");
-    return head->data;
+    return *head;
 }
 
-template<typename T>
-void List<T>::push_back(T const &data) {
-    Element *newNode = new Element(data, nullptr);
-    if (head == nullptr)
-        head = newNode;
-    if (tail != nullptr)
-        tail->next = newNode;
-    tail = newNode;
-    ++elements;
-}
-
-template<typename T>
-void List<T>::push_back(T &&data) {
-    Element *newNode = new Element(std::move(data), nullptr);
+template<typename a0, typename a1>
+void List<a0, a1>::push_back(a0 key, a1 info) {
+    auto *newNode = new Element<a0, a1>(key, info, nullptr);
     if (head == nullptr)
         head = newNode;
     if (tail != nullptr)
@@ -211,70 +219,70 @@ void List<T>::push_back(T &&data) {
 }
 
 
-template<typename T>
-bool List<T>::empty() const {
+template<typename a0, typename a1>
+bool List<a0, a1>::empty() const {
     return head == nullptr;
 }
 
-template<typename T>
-size_t List<T>::size() const {
+template<typename a0, typename a1>
+size_t List<a0, a1>::size() const {
     return elements;
 }
 
-template<typename T>
-T &List<T>::operator[](T const index) {
+template<typename a0, typename a1>
+Element<a0, a1> &List<a0, a1>::operator[](int const index) {
     int cont = 0;
-    Element *curr = head;
+    Element<a0, a1> *curr = head;
     while (curr) {
         if (cont == index)
-            return curr->data;
+            return curr->key;
         curr = curr->next;
         ++cont;
     }
     return nullptr;
 }
 
-template<typename T>
-T const &List<T>::operator[](T const index) const {
+template<typename a0, typename a1>
+Element<a0, a1> const &List<a0, a1>::operator[](int const index) const {
     int cont = 0;
-    Element *curr = head;
+    Element<a0, a1> *curr = head;
     while (curr) {
         if (cont == index)
-            return curr->data;
+            return curr->key;
         curr = curr->next;
         ++cont;
     }
     return nullptr;
 }
 
-template<typename T>
-T &List<T>::at(T const index) {
+template<typename a0, typename a1>
+Element<a0, a1> &List<a0, a1>::at(int const index) {
     int cont = 0;
-    Element *curr = head;
+    Element<a0, a1> *curr = head;
     while (curr) {
         if (cont == index)
-            return curr->data;
+            return *curr;
         curr = curr->next;
         cont++;
     }
 }
 
-template<typename T>
-T const &List<T>::at(T const index) const {
+template<typename a0, typename a1>
+Element<a0, a1> const &List<a0, a1>::at(int const index) const {
     int cont = 0;
-    Element *curr = head;
+    Element<a0, a1> *curr = head;
     while (curr) {
         if (cont == index)
-            return curr->data;
+            return curr->key;
         curr = curr->next;
         cont++;
     }
 }
 
 
-template<typename T>
-void List<T>::clear() {
-    Element *curr;
+template<typename a0, typename a1>
+void List<a0, a1>::clear() {
+    Element<a0, a1> *curr;
     while (head) {
         curr = head;
         head = head->next;
