@@ -3,85 +3,71 @@
 //
 
 #include <iostream>
-#include "Sequence.cpp"
+#include "Shuffle.cpp"
+#include "BST.cpp"
+#include "Ring.cpp"
+
 using namespace std;
 
-/**
- * shuffle produces new Sequence based on two sequences provided. It copies len1
- * number of elements of first sequence, starting from start1 offset. Then it adds
- * to the new sequence len2 number of elements of second sequence, starting from
- * start2 offset. Then the same action is performed on both sequences, but the
- * offset begins from the element following the element on which algorithm stopped
- * in both sequences, respectively. Number of copied elements is fixed. If algorithm
- * reached the end of first sequence it simply adds copied elements from second
- * sequence that remain to the end. This action is performed count number of times.
- *
- * @tparam key type of first parameter on which Sequence operates
- * @tparam info type of second parameter on which Sequence operates
- * @param s1 first sequence
- * @param start1 offset from first sequence
- * @param len1 number of copied elements form first sequence
- * @param s2 first sequence
- * @param start2 offset from second sequence
- * @param len2 number of copied elements form second sequence
- * @param count number of times of performed action
- * @return new Sequence built as described in the description
- */
-template <typename key, typename info>
-Sequence<key,info> shuffle(const Sequence<key, info> &s1, int start1, int len1,
-                           const Sequence<key, info> &s2, int start2, int len2, int count) {
-    List<key, info> elements1 = s1.getList();
-    List<key, info> elements2 = s2.getList();
-    List<key, info> elements3 = List<key, info>();
+void insertion_sort(int tab[], int size) {
+    int temp, j;
 
-    for(int k=0; k < count; k++){
-        int i = start1;
-        int j = start2;
-        while (i != elements1.size()) {
-            for(int m=0; m<len1; m++) {
-                elements3.push_back(elements1.at(i).getKey(), elements1.at(i).getInfo());
-                i++;
-                std::cout<<"1 list"<<std::endl;
-                std::cout<<"i="<<i<<"   "<<"j="<<j<<std::endl;
-            }
-            for(int m=0; m<len2; m++) {
-                elements3.push_back(elements2.at(j).getKey(), elements2.at(j).getInfo());
-                j++;
-                std::cout<<"i="<<i<<"   "<<"j="<<j<<std::endl;
-            }
-        }
-        while (j != elements2.size()) {
-            elements3.push_back(elements2.at(j).getInfo(), elements2.at(j).getInfo());
-            j++;
-            std::cout<<"i="<<i<<"   "<<"j="<<j<<std::endl;
-        }
+    for (int i = 1; i < size; i++) {
+        temp = tab[i];
+
+        for (j = i - 1; j >= 0 && tab[j] > temp; j--)
+            tab[j + 1] = tab[j];
+
+        tab[j + 1] = temp;
     }
-
-    for (int l = 0; l < elements3.size(); ++l) {
-        std::cout << elements3.at(l).getInfo() << std::endl;
-    }
-
-    return Sequence<key, info>(elements3);
 }
+
+template<typename K, typename T>
+Ring<K, T>
+produce(Ring<K, T> ring1, int start1, int steps1, Ring<K, T> ring2, int start2, int steps2, int times, bool clockwise) {
+    if (ring1.getHead() == nullptr || ring2.getHead() == nullptr) return Ring<K, T>();
+    auto *ring = new Ring<K, T>();
+    typename Ring<K, T>::RingIterator it1 = ring1.begin();
+    typename Ring<K, T>::RingIterator it2 = ring2.begin();
+
+    if (clockwise) {
+        it1 + start1;
+        it2 + start2;
+        for (int i = 0; i < times; i++) {
+            ring->add(it1.getInfo(), it1.getKey());
+            ring->add(it2.getInfo(), it2.getKey());
+            it1 + steps1;
+            it2 + steps2;
+        }
+    } else {
+        it1 - start1;
+        it2 - start2;
+        for (int i = 0; i < times; i++) {
+            ring->add(it1.getInfo(), it1.getKey());
+            ring->add(it2.getInfo(), it2.getKey());
+            it1 - steps1;
+            it2 - steps2;
+        }
+    }
+
+    return *ring;
+}
+
 
 int main() {
     cout << "Hello, World!" << endl;
+    Ring<int, int> ring1 = Ring<int, int>();
+    Ring<int, int> ring2 = Ring<int, int>();
 
-    List<int, int> list1 = List<int, int>();
-    List<int, int> list2 = List<int, int>();
-    int s1_size = 8;
-    int s2_size = 10;
-    for (int i = 0; i < s1_size; i++) list1.push_back(i + 1, i + 1);
-    for (int i = 0; i < s2_size; i++) list2.push_back(10 * (i + 1), 10 * (i + 1));
-    for (int i = 0; i < s1_size; i++) cout << list1.at(i).getInfo() << endl;
-    for (int i = 0; i < s2_size; i++) cout << list2.at(i).getInfo() << endl;
+    for (int i = 1; i <= 20; ++i) ring1.add(i, i);
+    for (int i = 1; i <= 20; ++i) ring2.add(100 * i, 100 * i);
 
-    Sequence<int, int> s1 = Sequence<int, int>(list1);
-    Sequence<int, int> s2 = Sequence<int, int>(list2);
+    Ring<int, int> ring = Ring<int, int>();
 
-    Sequence<int, int> sequence = shuffle(s1, 2, 2, s2, 0, 3, 2);
+    ring = produce(ring1, 10 - 1, 1, ring2, 5 - 1, 2, 10, true);
 
-    std::cout << "LOL" << std::endl;
+//    cout<<ring<<endl;
+    int cokolwiek = 10000;
     return 0;
 }
 
