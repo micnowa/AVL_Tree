@@ -75,7 +75,7 @@ struct Element {
  * @tparam a0 type of elements of the list
  */
 template<typename a0, typename a1>
-class List {
+class MyRing {
 private:
 
 
@@ -84,12 +84,12 @@ public:
      * Overwritten operator =
      * @return reference to the list
      */
-    List<a0, a1> &operator=(const List<a0, a1> &);
+    MyRing<a0, a1> &operator=(const MyRing<a0, a1> &);
 
     /**
      * Default destructor
      */
-    ~List();
+    ~MyRing();
 
     /**
      * Adds an element with given key and info
@@ -170,7 +170,9 @@ public:
 };
 
 template<typename a0, typename a1>
-List<a0, a1> &List<a0, a1>::operator=(const List<a0, a1> &that) {
+MyRing<a0, a1> &MyRing<a0, a1>::operator=(const MyRing<a0, a1> &that) {
+    if (this == &that)
+        return *this;
     Element<a0, a1> *tmp;
     while (head) {
         tmp = head;
@@ -183,7 +185,7 @@ List<a0, a1> &List<a0, a1>::operator=(const List<a0, a1> &that) {
 }
 
 template<typename a0, typename a1>
-List<a0, a1>::~List() {
+MyRing<a0, a1>::~MyRing() {
     Element<a0, a1> *tmp;
     while (head) {
         tmp = head;
@@ -194,43 +196,39 @@ List<a0, a1>::~List() {
 
 
 template<typename a0, typename a1>
-Element<a0, a1> &List<a0, a1>::front() {
+Element<a0, a1> &MyRing<a0, a1>::front() {
     if (head == nullptr)
-        throw std::runtime_error("List is empty ...");
+        throw std::runtime_error("MyRing is empty ...");
     return *head;
 }
 
 template<typename a0, typename a1>
-Element<a0, a1> const &List<a0, a1>::front() const {
+Element<a0, a1> const &MyRing<a0, a1>::front() const {
     if (head == nullptr)
         throw std::runtime_error("Invalid Action!");
     return *head;
 }
 
 template<typename a0, typename a1>
-void List<a0, a1>::push_back(a0 key, a1 info) {
+void MyRing<a0, a1>::push_back(a0 key, a1 info) {
     auto *newNode = new Element<a0, a1>(key, info, nullptr);
     if (head == nullptr)
         head = newNode;
     if (tail != nullptr)
         tail->next = newNode;
     tail = newNode;
+    tail->next = head;
     ++elements;
 }
 
+template<typename a0, typename a1>
+bool MyRing<a0, a1>::empty() const { return head == nullptr; }
 
 template<typename a0, typename a1>
-bool List<a0, a1>::empty() const {
-    return head == nullptr;
-}
+size_t MyRing<a0, a1>::size() const { return elements; }
 
 template<typename a0, typename a1>
-size_t List<a0, a1>::size() const {
-    return elements;
-}
-
-template<typename a0, typename a1>
-Element<a0, a1> &List<a0, a1>::operator[](int const index) {
+Element<a0, a1> &MyRing<a0, a1>::operator[](int const index) {
     int cont = 0;
     Element<a0, a1> *curr = head;
     while (curr) {
@@ -243,7 +241,7 @@ Element<a0, a1> &List<a0, a1>::operator[](int const index) {
 }
 
 template<typename a0, typename a1>
-Element<a0, a1> const &List<a0, a1>::operator[](int const index) const {
+Element<a0, a1> const &MyRing<a0, a1>::operator[](int const index) const {
     int cont = 0;
     Element<a0, a1> *curr = head;
     while (curr) {
@@ -256,7 +254,7 @@ Element<a0, a1> const &List<a0, a1>::operator[](int const index) const {
 }
 
 template<typename a0, typename a1>
-Element<a0, a1> &List<a0, a1>::at(int const index) {
+Element<a0, a1> &MyRing<a0, a1>::at(int const index) {
     int cont = 0;
     Element<a0, a1> *curr = head;
     while (curr) {
@@ -268,7 +266,7 @@ Element<a0, a1> &List<a0, a1>::at(int const index) {
 }
 
 template<typename a0, typename a1>
-Element<a0, a1> const &List<a0, a1>::at(int const index) const {
+Element<a0, a1> const &MyRing<a0, a1>::at(int const index) const {
     int cont = 0;
     Element<a0, a1> *curr = head;
     while (curr) {
@@ -281,7 +279,7 @@ Element<a0, a1> const &List<a0, a1>::at(int const index) const {
 
 
 template<typename a0, typename a1>
-void List<a0, a1>::clear() {
+void MyRing<a0, a1>::clear() {
     Element<a0, a1> *curr;
     while (head) {
         curr = head;

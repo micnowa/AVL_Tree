@@ -1,22 +1,55 @@
 //
-// Created by Michał Nowaliński on 14-Dec-18.
+// Created by Michał Nowaliński on 20-Dec-18.
 //
 
 #include<iostream>
 #include <iomanip>
+
 using namespace std;
 
+
+/**
+ * AVL Tree is an extension to Binary Search Tree. Nodes are added and kept in the same way
+ * as in BST(Binary Search Tree). AVL is found to be significant improvement to BST. It is
+ * called self-organising BST, due to the fact it is balanced. By that we understand that
+ * we avoid situation when data is structured into a list. Balanced in that case means that
+ * every two subtrees whose root is same node have heights different at the most by 1. It
+ * is achieved via adding operation of balancing after adding or removing a node.
+ * @tparam T type of data in nodes, it needs to have overwritten operators: >, <, =, ==, !=
+ */
 template<typename T>
-class BST {
+class AVLTree {
+    /**
+     * Structure symbolizing a node in the trees
+     */
     struct Node {
+        /**
+         * data in Node
+         */
         T data;
+        /**
+         * left subtree root
+         */
         Node *left;
+        /**
+         * right subtree root
+         */
         Node *right;
+        /**
+         * height of tree
+         */
         int height;
     };
 
+    /**
+     * Root node
+     */
     Node *root;
 
+    /**
+     * Clears tree
+     * @param node root of tree
+     */
     void makeEmpty(Node *node) {
         if (node == NULL) return;
         makeEmpty(node->left);
@@ -24,6 +57,12 @@ class BST {
         delete node;
     }
 
+    /**
+     * Inserts data into tree and performs balancing
+     * @param data data to be inserted
+     * @param node root ot tree
+     * @return node with data that was created
+     */
     Node *insert(T data, Node *node) {
         if (node == NULL) {
             node = new Node;
@@ -52,68 +91,94 @@ class BST {
         return node;
     }
 
+    /**
+     * Single right rotation of subtree
+     * @param node node root of subtree
+     * @return
+     */
     Node *singleRightRotate(Node *&node) {
-        Node *u = node->left;
-        node->left = u->right;
-        u->right = node;
+        Node *tmp = node->left;
+        node->left = tmp->right;
+        tmp->right = node;
         node->height = max(height(node->left), height(node->right)) + 1;
-        u->height = max(height(u->left), node->height) + 1;
-        return u;
+        tmp->height = max(height(tmp->left), node->height) + 1;
+        return tmp;
     }
 
+    /**
+     * Single left rotation of subtree
+     * @param node node root of subtree
+     * @return
+     */
     Node *singleLeftRotate(Node *&node) {
-        Node *u = node->right;
-        node->right = u->left;
-        u->left = node;
+        Node *tmp = node->right;
+        node->right = tmp->left;
+        tmp->left = node;
         node->height = max(height(node->left), height(node->right)) + 1;
-        u->height = max(height(node->right), node->height) + 1;
-        return u;
+        tmp->height = max(height(node->right), node->height) + 1;
+        return tmp;
     }
 
+    /**
+     * Double left rotation of subtree
+     * @param node node root of subtree
+     * @return
+     */
     Node *doubleLeftRotate(Node *&node) {
         node->right = singleRightRotate(node->right);
         return singleLeftRotate(node);
     }
 
+    /**
+     * Double right rotation of subtree
+     * @param node
+     * @return
+     */
     Node *doubleRightRotate(Node *&node) {
         node->left = singleLeftRotate(node->left);
         return singleRightRotate(node);
     }
 
+    /**
+     * Returns min value of subtree
+     * @param node root of subtree
+     * @return Min value of subtree
+     */
     Node *findMin(Node *node) {
-        if (node == NULL)
-            return NULL;
-        else if (node->left == NULL)
-            return node;
-        else
-            return findMin(node->left);
+        if (node == NULL) return NULL;
+        else if (node->left == NULL) return node;
+        else return findMin(node->left);
     }
 
+    /**
+     * Returns max value of subtree
+     * @param node root of subtree
+     * @return Max value of subtree
+     */
     Node *findMax(Node *node) {
-        if (node == NULL)
-            return NULL;
-        else if (node->right == NULL)
-            return node;
-        else
-            return findMax(node->right);
+        if (node == NULL) return NULL;
+        else if (node->right == NULL) return node;
+        else return findMax(node->right);
     }
 
+    /**
+     * Removes node with data from subtree
+     * @param data data with which node shall be removed
+     * @param node root of subtree
+     * @return node on which the function stopped looking for wanted node
+     */
     Node *remove(T data, Node *node) {
         Node *temp;
 
-        // Element not found
         if (node == NULL) return NULL;
         else if (data < node->data) node->left = remove(data, node->left);
         else if (data > node->data) node->right = remove(data, node->right);
 
-            // Element found
-            // With 2 children
         else if (node->left && node->right) {
             temp = findMin(node->right);
             node->data = temp->data;
             node->right = remove(node->data, node->right);
         }
-            // With one or zero child
         else {
             temp = node;
             if (node->left == NULL) node = node->right;
@@ -124,64 +189,79 @@ class BST {
 
         node->height = max(height(node->left), height(node->right)) + 1;
 
-        // If Node is unbalanced
-        // If left Node is deleted, right case
         if (height(node->left) - height(node->right) == 2) {
-            // right right case
-            if (height(node->left->left) - height(node->left->right) == 1)
-                return singleLeftRotate(node);
-                // right left case
-            else
-                return doubleLeftRotate(node);
+            if (height(node->left->left) - height(node->left->right) == 1) return singleLeftRotate(node);
+            else return doubleLeftRotate(node);
         }
-            // If right Node is deleted, left case
         else if (height(node->right) - height(node->left) == 2) {
-            // left left case
-            if (height(node->right->right) - height(node->right->left) == 1)
-                return singleRightRotate(node);
-                // left right case
-            else
-                return doubleRightRotate(node);
+            if (height(node->right->right) - height(node->right->left) == 1) return singleRightRotate(node);
+            else return doubleRightRotate(node);
         }
         return node;
     }
 
+    /**
+     * Returns height of given subtree or -1 if root is equal to null pointer
+     * @param node root of subtree
+     * @return height of given subtree or -1 if root is equal to null pointer
+     */
     int height(Node *node) {
         return node == NULL ? -1 : node->height;
     }
 
+    /**
+     * Return balance of given node, which means difference between height of right and left subtrees
+     * @param node
+     * @return
+     */
     int getBalance(Node *node) {
         return node == NULL ? 0 : height(node->left) - height(node->right);
     }
 
+    /**
+     * Prints subtree to standard output
+     * @param root root of subtree
+     * @param space indent between data printed
+     */
     void print(Node *root, int space) {
-        // Base case
         int COUNT = 10;
         if (root == NULL) return;
-        space += COUNT; // Increase distance between levels
-        print(root->right, space); // Process right child first
+        space += COUNT;
+        print(root->right, space);
 
-        // Print current node after space
-        // count
         printf("\n");
         for (int i = COUNT; i < space; i++) printf(" ");
-        cout<<root->data<<endl;
+        cout << root->data << endl;
         print(root->left, space); // Process left child
     }
 
 public:
-    BST() {
+    /**
+     * Default constructor
+     */
+    AVLTree() {
         root = NULL;
     }
 
+    /**
+     * Inserts node with given data.
+     * @param x data with which node shall be inserted
+     */
     void insert(T x) {
         root = insert(x, root);
     }
 
+    /**
+     * Removes node with given data, if tree does not have such node nothing happens
+     * @param x data with which node shall be removed
+     */
     void remove(T x) {
         root = remove(x, root);
     }
 
+    /**
+     * Prints tree to standard output
+     */
     void print() {
         if (root == nullptr) cout << "Empty tree" << endl;
         print(root, 1);

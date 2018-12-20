@@ -15,13 +15,13 @@ public:
     /**
      * list with keys and infos
      */
-    List<a0, a1> list;
+    MyRing<a0, a1> list;
 
     /**
      * Constructor with arguments
      * @param elements elements
      */
-    Sequence(const List<a0, a1> &elements) : list(elements) {}
+    Sequence(const MyRing<a0, a1> &elements) : list(elements) {}
 
     /**
      * Default constructor
@@ -32,17 +32,10 @@ public:
      * Gets list
      * @return list
      */
-    const List<a0, a1> &getList() const {
+    const MyRing<a0, a1> &getList() const {
         return list;
     }
 
-    /**
-     * Sets list
-     * @param list list
-     */
-    void setList(const List<a0, a1> &list) {
-        Sequence::list = list;
-    }
 
     /**
      * Returns info corresponding to key provided as the argument
@@ -55,4 +48,43 @@ public:
         }
         return NULL;
     }
+
+    /**
+     * Adds an element
+     * @param key key of the element
+     * @param value value of the element
+     */
+    void addElement(a0 key, a1 value) {
+        list.push_back(key, value);
+    }
+
+    /**
+     * Gets element
+     * @param index index of the element
+     * @return element at given index
+     */
+    Element<a0,a1> getElement(int index) {
+        return list.at(index);
+    }
+
+    Element<a0,a1> getElementByKy(a0 key) {
+        for(int i= 0;i < list.size(); i++) if(list.getElement(i).getKey() == key) return list.getElement();
+        return NULL;
+    }
+
+    /**
+     * Compares two sequences
+     * @param sequence sequence to compare
+     * @return true if sequences are equal, false if they are not
+     */
+    bool compare(Sequence sequence) {
+        int size = list.size();
+        if(sequence.getList().size() != size) return false;
+        for (int i = 0; i < size; ++i) {
+            if(list.at(i).getKey() != sequence.getList().at(i).getKey()) return false;
+            if(list.at(i).getInfo() != sequence.getList().at(i).getInfo()) return false;
+        }
+        return true;
+    }
+
 };
