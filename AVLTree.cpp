@@ -135,7 +135,7 @@ class AVLTree {
     Node *singleRightRotate(Node *&node) {
         Node *tmp = node->left;
         node->left = tmp->right;
-        if(tmp->right != nullptr) node->right->parent = node;
+        if(tmp->right != nullptr) tmp->right->parent = node;
         tmp->parent = node->parent;
         tmp->right = node;
         node->parent = tmp;
@@ -153,7 +153,8 @@ class AVLTree {
     Node *singleLeftRotate(Node *&node) {
         Node *tmp = node->right;
         node->right = tmp->left;
-        if(tmp->left != nullptr) node->left->parent = node;
+        if(tmp->left != nullptr)
+            tmp->left->parent = node;
         tmp->parent = node->parent;
         tmp->left = node;
         node->parent = tmp;

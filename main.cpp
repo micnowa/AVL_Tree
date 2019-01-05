@@ -69,8 +69,6 @@ int main() {
     tree->insert(5, "emu");
     tree->insert(6, "fasola");
     tree->insert(7, "groszek");
-    tree->remove(7);
-    tree->remove(6);
 
     std::map<string,string> map;
 
