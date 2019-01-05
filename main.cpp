@@ -69,16 +69,24 @@ int main() {
     tree->insert(5, "emu");
     tree->insert(6, "fasola");
     tree->insert(7, "groszek");
+    tree->insert(8, "irys");
+    tree->insert(9, "jablko");
+    tree->insert(10, "koper");
 
-    std::map<string,string> map;
+
 
 
 
     tree->print();
 
-    /*AVLTree<int, string>::TreeIterator it1 = tree->begin();
-    AVLTree<int, string>::TreeIterator it2 = tree->end();
-    AVLTree<int, string>::TreeIterator it3 = tree->last();*/
+    AVLTree<int, string>::TreeIterator it1 = tree->begin();
+//    AVLTree<int, string>::TreeIterator it2 = tree->end();
+//    AVLTree<int, string>::TreeIterator it3 = tree->last();
+    it1++;
+    it1++;
+    it1++;
+    it1++;
+
 
     int cos = 900;
 

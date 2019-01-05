@@ -81,10 +81,10 @@ class AVLTree {
         else return searchParent(node->left, key);
     }
 
-    Node* findKey(Node* node, t1 key) {
-        if(node == nullptr) return nullptr;
-        else if(node->key == key) return node;
-        else if(key > node->key ) return findKey(node->right, key);
+    Node *findKey(Node *node, t1 key) {
+        if (node == nullptr) return nullptr;
+        else if (node->key == key) return node;
+        else if (key > node->key) return findKey(node->right, key);
         return findKey(node->left, key);
     }
 
@@ -135,7 +135,7 @@ class AVLTree {
     Node *singleRightRotate(Node *&node) {
         Node *tmp = node->left;
         node->left = tmp->right;
-        if(tmp->right != nullptr) tmp->right->parent = node;
+        if (tmp->right != nullptr) tmp->right->parent = node;
         tmp->parent = node->parent;
         tmp->right = node;
         node->parent = tmp;
@@ -153,7 +153,7 @@ class AVLTree {
     Node *singleLeftRotate(Node *&node) {
         Node *tmp = node->right;
         node->right = tmp->left;
-        if(tmp->left != nullptr)
+        if (tmp->left != nullptr)
             tmp->left->parent = node;
         tmp->parent = node->parent;
         tmp->left = node;
@@ -264,19 +264,19 @@ class AVLTree {
 
     /**
      * Prints subtree to standard output
-     * @param root root of subtree
+     * @param node root of subtree
      * @param space indent between data printed
      */
-    void print(Node *root, int space) {
+    void print(Node *node, int space) {
         int COUNT = 10;
-        if (root == NULL) return;
+        if (node == NULL) return;
         space += COUNT;
-        print(root->right, space);
+        print(node->right, space);
 
         printf("\n");
         for (int i = COUNT; i < space; i++) printf(" ");
-        cout << root->key << "  " << root->value << endl;
-        print(root->left, space); // Process left child
+        cout << node->key << "  " << node->value << endl;
+        print(node->left, space); // Process left child
     }
 
 public:
@@ -293,7 +293,9 @@ public:
          * Constructor with element iterator points to
          * @param node
          */
-        Iterator(Node *element) { it = element; }
+        Iterator(Node *element) {
+            it = element;
+        }
 
         /**
          * Destructor
@@ -338,6 +340,7 @@ public:
             return *this;
         }
 
+
         /**
          * Overwritten operator ++. Moves forward by one
          * @return iterator
@@ -345,54 +348,53 @@ public:
         Iterator &operator++() {
             Node *p;
 
-            /*if (nodePtr == NULL) {
-                // ++ from end(). get the root of the tree
-                nodePtr = tree->root;
-
-                // error! ++ requested for an empty tree
-                if (nodePtr == NULL)
-                    throw
-                            underflowError("stree iterator operator++ (): tree empty");
-
-                // move to the smallest value in the tree,
-                // which is the first node inorder
-                while (nodePtr->left != NULL) {
-                    nodePtr = nodePtr->left;
+            if (it == nullptr) {
+                if (it == nullptr) return nullptr;
+                while (it->left != nullptr) {
+                    it = it->left;
                 }
-            } else if (nodePtr->right != NULL) {
-                // successor is the furthest left node of
-                // right subtree
-                nodePtr = nodePtr->right;
+            } else if (it->right != nullptr) {
+                it = it->right;
 
-                while (nodePtr->left != NULL) {
-                    nodePtr = nodePtr->left;
+                while (it->left != nullptr) {
+                    it = it->left;
                 }
             } else {
-
-                p = nodePtr->parent;
-                while (p != NULL && nodePtr == p->right) {
-                    nodePtr = p;
+                p = it->parent;
+                while (p != nullptr && it == p->right) {
+                    it = p;
                     p = p->parent;
                 }
-
-                // if we were previously at the right-most node in
-                // the tree, nodePtr = NULL, and the iterator specifies
-                // the end of the list
-                nodePtr = p;
-            }*/
-
+                it = p;
+            }
             return *this;
         }
 
-        /**
-         * Overwritten operator ++. Moves forward by one
-         * @return iterator
-         */
+
         Iterator &operator++(int) {
             if (!it) return *this;
             else {
+                Node *p;
                 auto *temporary = new Iterator(it);
-                it = it->next;
+                if (it == nullptr) {
+//                    if (it == nullptr) return nullptr;
+                    while (it->left != nullptr) {
+                        it = it->left;
+                    }
+                } else if (it->right != nullptr) {
+                    it = it->right;
+
+                    while (it->left != nullptr) {
+                        it = it->left;
+                    }
+                } else {
+                    p = it->parent;
+                    while (p != nullptr && it == p->right) {
+                        it = p;
+                        p = p->parent;
+                    }
+                    it = p;
+                }
                 return *temporary;
             }
         }
@@ -563,7 +565,7 @@ public:
         root = remove(x, root);
     }
 
-    Node* search(t1 key) {
+    Node *search(t1 key) {
         return findKey(root, key);
     }
 
@@ -574,4 +576,6 @@ public:
         if (root == nullptr) cout << "Empty tree" << endl;
         print(root, 1);
     }
+
+
 };
