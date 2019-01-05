@@ -61,22 +61,28 @@ produce(Ring<K, T> ring1, int start1, int steps1, Ring<K, T> ring2, int start2, 
 
 
 int main() {
-    auto *tree = new AVLTree<string>();
-    tree->insert("arbuz");
-    tree->insert("banan");
-    tree->insert("cytryna");
-    tree->insert("dynia");
-    tree->insert("emu");
-    tree->insert("fasola");
-    tree->insert("groszek");
-    tree->remove("groszek");
-    tree->remove("dynia");
+    auto *tree = new AVLTree<int, string>();
+    tree->insert(1, "arbuz");
+    tree->insert(2, "banan");
+    tree->insert(3, "cytryna");
+    tree->insert(4, "dynia");
+    tree->insert(5, "emu");
+    tree->insert(6, "fasola");
+    tree->insert(7, "groszek");
+    tree->remove(7);
+    tree->remove(6);
 
     std::map<string,string> map;
 
 
 
     tree->print();
+
+    /*AVLTree<int, string>::TreeIterator it1 = tree->begin();
+    AVLTree<int, string>::TreeIterator it2 = tree->end();
+    AVLTree<int, string>::TreeIterator it3 = tree->last();*/
+
+    int cos = 900;
 
     return 0;
 }
