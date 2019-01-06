@@ -15,7 +15,8 @@ using namespace std;
  * we avoid situation when data is structured into a list. Balanced in that case means that
  * every two subtrees whose root is same node have heights different at the most by 1. It
  * is achieved via adding operation of balancing after adding or removing a node.
- * @tparam t1 type of data in nodes, it needs to have overwritten operators: >, <, =, ==, !=
+ * @tparam t1 type of key in nodes, it needs to have overwritten operators: >, <, =, ==, !=
+ * @tparam t2 type of value in nodes, it needs to have overwritten operators: >, <, =, ==, !=
  */
 template<typename t1, typename t2>
 class AVLTree {
@@ -65,6 +66,12 @@ class AVLTree {
         delete node;
     }
 
+    /**
+     * Creates new node with given key and value
+     * @param key key of new node
+     * @param value value of new node
+     * @return pointer to new node
+     */
     Node *newNode(t1 key, t2 value) {
         Node *temp = new Node;
         temp->key = key;
@@ -74,6 +81,12 @@ class AVLTree {
         return temp;
     }
 
+     /**
+      * Looks for node with given key
+      * @param node node from which recursive searching is performed
+      * @param key key to be looked for
+      * @return node with given key
+      */
     Node *findKey(Node *node, t1 key) {
         if (node == nullptr) return nullptr;
         else if (node->key == key) return node;
@@ -81,6 +94,12 @@ class AVLTree {
         return findKey(node->left, key);
     }
 
+    /**
+     * Looks for node with given value
+     * @param node node from which recursive searching is performed
+     * @param value value to be looked for
+     * @return node with given value
+     */
     Node *findValue(Node *node, t2 value) {
         if (node == nullptr) return nullptr;
         else if (node->value == value) return node;
@@ -149,7 +168,7 @@ class AVLTree {
     /**
      * Single left rotation of subtree
      * @param node node root of subtree
-     * @return
+     * @return node
      */
     Node *singleLeftRotate(Node *&node) {
         Node *tmp = node->right;
@@ -169,7 +188,7 @@ class AVLTree {
     /**
      * Double left rotation of subtree
      * @param node node root of subtree
-     * @return
+     * @return node
      */
     Node *doubleLeftRotate(Node *&node) {
         node->right = singleRightRotate(node->right);
@@ -178,8 +197,8 @@ class AVLTree {
 
     /**
      * Double right rotation of subtree
-     * @param node
-     * @return
+     * @param node node
+     * @return node
      */
     Node *doubleRightRotate(Node *&node) {
         node->left = singleLeftRotate(node->left);
@@ -257,8 +276,8 @@ class AVLTree {
 
     /**
      * Return balance of given node, which means difference between height of right and left subtrees
-     * @param node
-     * @return
+     * @param node node whoose balance is checked
+     * @return balance
      */
     int getBalance(Node *node) {
         return node == NULL ? 0 : height(node->left) - height(node->right);
@@ -372,7 +391,10 @@ public:
             return *this;
         }
 
-
+        /**
+         * Overwritten operator++
+         * @return next iterator
+         */
         const Iterator<K, I> operator++(int) {
             if (!it) return *this;
             else {
@@ -493,10 +515,10 @@ public:
         t1 getKey() { return it->key; }
 
         /**
-         * returns info
-         * @return info
+         * returns value
+         * @return value
          */
-        t2 getInfo() { return it->info; }
+        t2 getValue() { return it->value; }
 
         /**
          * Friend function used to printing ring using cout
@@ -616,10 +638,20 @@ public:
         root = remove(x, y, root);
     }
 
+    /**
+     * Looks for Node with given key
+     * @param key key which a Node shall have
+     * @return Node that has such key
+     */
     Node *searchKey(t1 key) {
         return findKey(root, key);
     }
 
+    /**
+     * Looks for Node with given value
+     * @param value value which a Node shall have
+     * @return Node that has such value
+     */
     Node *searchValue(t2 value) {
         return findValue(root, value);
     }
@@ -676,18 +708,12 @@ public:
         return true;
     }
 
-    friend bool compare(AVLTree &tree1, AVLTree &tree2) {
-        if(tree2.root == nullptr && tree1.root == nullptr) return true;
-        TreeIterator it = tree2.begin();
-        for (TreeIterator itTree = tree1.begin(); itTree != tree1.end(); itTree++) {
-            if (it == nullptr && itTree == nullptr) return true;
-            if (it == nullptr || itTree == nullptr) return false;
-            if (it->key != itTree->key && it->value != itTree->value) return false;
-            it++;
-        }
-        return true;
-    }
 
+    /**
+     * Overwritten operator=
+     * @param tree tree to which new tree is created
+     * @return reference to newly created tree
+     */
     AVLTree& operator=(const AVLTree &tree) {
         auto *newTree = new AVLTree(tree);
         return *newTree;
