@@ -589,6 +589,17 @@ public:
     }
 
     /**
+     * COpying contrcutor
+     * @param tree tree based on which new tree shall be created
+     */
+    AVLTree(AVLTree &tree) {
+        root = NULL;
+        for (TreeIterator it = tree.begin(); it != tree.end(); it++){
+            insert(it->key, it->value);
+        }
+    }
+
+    /**
      * Inserts node with given data.
      * @param x data with which node shall be inserted
      */
@@ -645,6 +656,41 @@ public:
         }
         t1 key = searchValue(value)->key;
         return key;
+    }
+
+    /**
+     * Operator == that checks if two trees are equal
+     * @param tree1 first tree
+     * @param tree2 second tree
+     * @return true if trees are equal, false otherwise
+     */
+    friend bool operator==(AVLTree &tree1, AVLTree &tree2) {
+        if(tree2.root == nullptr && tree1.root == nullptr) return true;
+        TreeIterator it = tree2.begin();
+        for (TreeIterator itTree = tree1.begin(); itTree != tree1.end(); itTree++) {
+            if (it == nullptr && itTree == nullptr) return true;
+            if (it == nullptr || itTree == nullptr) return false;
+            if (it->key != itTree->key && it->value != itTree->value) return false;
+            it++;
+        }
+        return true;
+    }
+
+    friend bool compare(AVLTree &tree1, AVLTree &tree2) {
+        if(tree2.root == nullptr && tree1.root == nullptr) return true;
+        TreeIterator it = tree2.begin();
+        for (TreeIterator itTree = tree1.begin(); itTree != tree1.end(); itTree++) {
+            if (it == nullptr && itTree == nullptr) return true;
+            if (it == nullptr || itTree == nullptr) return false;
+            if (it->key != itTree->key && it->value != itTree->value) return false;
+            it++;
+        }
+        return true;
+    }
+
+    AVLTree& operator=(const AVLTree &tree) {
+        auto *newTree = new AVLTree(tree);
+        return *newTree;
     }
 
 };

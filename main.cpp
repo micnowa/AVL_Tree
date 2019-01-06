@@ -124,7 +124,7 @@ int main() {
     cout << endl;
 
     // Test of operator () and looking for key of given value
-    int i=0;
+    int i = 0;
     for (Iterator it = tree->begin(); it != tree->end(); it++) {
         int key = (*tree)(plants[i]);
         if (key == it->key) {
@@ -133,6 +133,13 @@ int main() {
         i++;
     }
 
+    cout << endl;
+    // Test of copying constructor, operator== and operator=
+    auto *newTreeCopyingConstructor = new AVLTree<int, string>(*tree);
+    AVLTree<int, string> newTreeOperatorEquals = *newTreeCopyingConstructor;
+    if(*tree == *tree) cout<<"Operator== works!"<<endl;
+    if(*tree == *newTreeCopyingConstructor) cout<<"Copying Contructor works"<<endl;
+    if(*tree == newTreeOperatorEquals) cout<<"Operator= works"<<endl;
 
     return 0;
 }
