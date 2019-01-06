@@ -11,6 +11,9 @@
 
 using namespace std;
 
+typedef AVLTree<int, string>::TreeIterator Iterator;
+
+
 /**
  * Algorithm produces new Ring object based on two rings provided. It lookups the 1st and 2nd ring
  * in the way that it starts from star1 and start2 positions respectively, and gathers data. Lookup is
@@ -32,7 +35,8 @@ using namespace std;
  */
 template<typename K, typename T>
 Ring<K, T>
-produce(Ring<K, T> ring1, int start1, int steps1, Ring<K, T> ring2, int start2, int steps2, int times, bool clockwise1, bool clockwise2, bool begin) {
+produce(Ring<K, T> ring1, int start1, int steps1, Ring<K, T> ring2, int start2, int steps2, int times, bool clockwise1,
+        bool clockwise2, bool begin) {
     if (ring1.getHead() == nullptr || ring2.getHead() == nullptr) return Ring<K, T>();
     auto *ring = new Ring<K, T>();
     typename Ring<K, T>::RingIterator it1 = ring1.begin();
@@ -41,17 +45,17 @@ produce(Ring<K, T> ring1, int start1, int steps1, Ring<K, T> ring2, int start2, 
     it1 + start1;
     it2 + start2;
     int i = 0;
-    while(i!=times) {
+    while (i != times) {
         for (int j = 0; j < steps1; j++) {
-            if(begin) ring->addBegin(it1.getKey(), it1.getInfo());
+            if (begin) ring->addBegin(it1.getKey(), it1.getInfo());
             else ring->addEnd(it1.getKey(), it1.getInfo());
-            if(clockwise1) it1++;
+            if (clockwise1) it1++;
             else it1--;
         }
         for (int j = 0; j < steps2; j++) {
-            if(begin) ring->addBegin(it2.getKey(), it2.getInfo());
+            if (begin) ring->addBegin(it2.getKey(), it2.getInfo());
             else ring->addEnd(it2.getKey(), it2.getInfo());
-            if(clockwise2) it2++;
+            if (clockwise2) it2++;
             else it2--;
         }
         i++;
@@ -63,51 +67,72 @@ produce(Ring<K, T> ring1, int start1, int steps1, Ring<K, T> ring2, int start2, 
 
 int main() {
     auto *tree = new AVLTree<int, string>();
-    tree->insert(1, "arbuz");
-    tree->insert(2, "banan");
-    tree->insert(3, "cytryna");
-    tree->insert(4, "dynia");
-    tree->insert(5, "emu");
-    tree->insert(6, "fasola");
-    tree->insert(7, "groszek");
-    tree->insert(8, "irys");
-    tree->insert(9, "jablko");
-    tree->insert(10, "koper");
-    tree->remove(10);
-
-    tree->print();
-
-    AVLTree<int, string>::TreeIterator it1 = tree->begin();
-    AVLTree<int, string>::TreeIterator it2 = tree->last();
-
-
-    for (AVLTree<int, string>::TreeIterator it = tree->last(); it != tree->end(); it--) {
-        cout<<it->key<<"    "<<it->value<<endl;
+    auto *treeRemovedOddElements = new AVLTree<int, string>();
+    int n = 15;
+    string plants[15] = {"arbuz", "banan", "cytryna", "dynia", "eukaliptus", "fasola", "groszek", "hiacynt", "irys",
+                         "jablko", "koper", "lilia", "mango", "nektarynka", "orzech"};
+    for (int i = 0; i < n; i++) {
+        tree->insert(i + 1, plants[i]);
+        treeRemovedOddElements->insert(i + 1, plants[i]);
+    }
+    for (int i = 0; i < n; i += 2) {
+        treeRemovedOddElements->remove(i + 1);
     }
 
 
-    int cos = 900;
+    tree->print();
+    cout << "**************************" << endl;
+    treeRemovedOddElements->print();
 
-    auto *treeNew = new AVLTree<string, string>();
-    treeNew->insert("1", "arbuz");
-    treeNew->insert("2", "banan");
-    treeNew->insert("3", "cytryna");
-    treeNew->insert("4", "dynia");
-    treeNew->insert("5", "emu");
-    treeNew->insert("6", "fasola");
-    treeNew->insert("7", "groszek");
-    treeNew->insert("8", "irys");
-    treeNew->insert("9", "jablko");
+    Iterator it_first = tree->begin();
+    Iterator it_first_last = tree->last();
 
-    cout<<(*treeNew)["1"]<<endl;
-    cout<<(*treeNew)["2"]<<endl;
-    cout<<(*treeNew)["3"]<<endl;
-    cout<<(*treeNew)["4"]<<endl;
-    cout<<(*treeNew)["5"]<<endl;
-    cout<<(*treeNew)["6"]<<endl;
-    cout<<(*treeNew)["7"]<<endl;
-    cout<<(*treeNew)["8"]<<endl;
-    cout<<(*treeNew)["9"]<<endl;
+
+    // Test of removing and iterator ++
+    it_first++;
+    for (Iterator it = treeRemovedOddElements->begin(); it != treeRemovedOddElements->end(); it++) {
+        if (it->value == it_first->value && it->key == it_first->key) {
+            cout << it->key << "    " << it->value << " Elements corresponds" << endl;
+        } else throw std::invalid_argument("eit key or value does not correspond, or iterator is not working");
+        it_first++;
+        it_first++;
+    }
+
+    cout << endl;
+
+
+    // Test of removing and iterator --
+    it_first_last--;
+    for (Iterator it = treeRemovedOddElements->last(); it != treeRemovedOddElements->end(); it--) {
+        if (it->value == it_first_last->value && it->key == it_first_last->key) {
+            cout << it->key << "    " << it->value << ", Elements corresponds" << endl;
+        } else throw std::invalid_argument("eit key or value does not correspond, or iterator is not working");
+        it_first_last--;
+        it_first_last--;
+    }
+
+    cout << endl;
+
+    // Test of operator [] and looking for value of given key
+    for (Iterator it = tree->begin(); it != tree->end(); it++) {
+        int key = it->key;
+        if ((*tree)[key] == it->value) {
+            cout << it->key << "    " << it->value << ", Elements correspond" << endl;
+        }
+    }
+
+    cout << endl;
+
+    // Test of operator () and looking for key of given value
+    int i=0;
+    for (Iterator it = tree->begin(); it != tree->end(); it++) {
+        int key = (*tree)(plants[i]);
+        if (key == it->key) {
+            cout << it->key << "    " << it->value << ", Elements correspond" << endl;
+        }
+        i++;
+    }
+
 
     return 0;
 }

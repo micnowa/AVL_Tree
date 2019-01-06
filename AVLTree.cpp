@@ -81,6 +81,14 @@ class AVLTree {
         return findKey(node->left, key);
     }
 
+    Node *findValue(Node *node, t2 value) {
+        if (node == nullptr) return nullptr;
+        else if (node->value == value) return node;
+        else if (value > node->value) return findValue(node->right, value);
+        return findValue(node->left, value);
+    }
+
+
     /**
      * Inserts data into tree and performs balancing
      * @param key data to be inserted
@@ -206,17 +214,18 @@ class AVLTree {
      * @param node root of subtree
      * @return node on which the function stopped looking for wanted node
      */
-    Node *remove(t1 key, Node *node) {
+    Node *remove(t1 key, t2 value, Node *node) {
         Node *temp;
 
         if (node == NULL) return NULL;
-        else if (key < node->key) node->left = remove(key, node->left);
-        else if (key > node->key) node->right = remove(key, node->right);
+        else if (key < node->key) node->left = remove(key, value, node->left);
+        else if (key > node->key) node->right = remove(key, value, node->right);
 
         else if (node->left && node->right) {
             temp = findMin(node->right);
             node->key = temp->key;
-            node->right = remove(node->key, node->right);
+            node->value = temp->value;
+            node->right = remove(node->key, node->value, node->right);
         } else {
             temp = node;
             if (node->left == NULL) node = node->right;
@@ -592,11 +601,16 @@ public:
      * @param x data with which node shall be removed
      */
     void remove(t1 x) {
-        root = remove(x, root);
+        t2 y = searchKey(x)->value;
+        root = remove(x, y, root);
     }
 
-    Node *search(t1 key) {
+    Node *searchKey(t1 key) {
         return findKey(root, key);
+    }
+
+    Node *searchValue(t2 value) {
+        return findValue(root, value);
     }
 
     /**
@@ -613,11 +627,24 @@ public:
      * @return value of given element
      */
     t2 operator[](t1 key) {
-        if (search(key) == nullptr) {
+        if (searchKey(key) == nullptr) {
             throw std::invalid_argument("Tree does not have such key");
         }
-        t2 val = search(key)->value;
+        t2 val = searchKey(key)->value;
         return val;
+    }
+
+    /**
+     * Overwritten operator()
+     * @param value value of element we are looking for
+     * @return key of given element
+     */
+    t1 operator()(t2 value) {
+        if (searchValue(value) == nullptr) {
+            throw std::invalid_argument("Tree does not have such key");
+        }
+        t1 key = searchValue(value)->key;
+        return key;
     }
 
 };
