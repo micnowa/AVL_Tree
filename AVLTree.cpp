@@ -74,13 +74,6 @@ class AVLTree {
         return temp;
     }
 
-    Node *searchParent(Node *node, t1 key) {
-        if (node == nullptr) return nullptr;
-        if (node->left->key == key || node->right->key == key) return node;
-        if (node->key > node->key) return searchParent(node->right, key);
-        else return searchParent(node->left, key);
-    }
-
     Node *findKey(Node *node, t1 key) {
         if (node == nullptr) return nullptr;
         else if (node->key == key) return node;
@@ -371,13 +364,12 @@ public:
         }
 
 
-        Iterator &operator++(int) {
+        const Iterator<K, I> operator++(int) {
             if (!it) return *this;
             else {
                 Node *p;
                 auto *temporary = new Iterator(it);
                 if (it == nullptr) {
-//                    if (it == nullptr) return nullptr;
                     while (it->left != nullptr) {
                         it = it->left;
                     }
@@ -404,7 +396,27 @@ public:
          * @return iterator
          */
         Iterator &operator--() {
-            if (it) it = it->prev;
+            Node *p;
+
+            if (it == nullptr) {
+                if (it == nullptr) return nullptr;
+                while (it->right != nullptr) {
+                    it = it->right;
+                }
+            } else if (it->left != nullptr) {
+                it = it->left;
+
+                while (it->right != nullptr) {
+                    it = it->right;
+                }
+            } else {
+                p = it->parent;
+                while (p != nullptr && it == p->left) {
+                    it = p;
+                    p = p->parent;
+                }
+                it = p;
+            }
             return *this;
         }
 
@@ -412,11 +424,29 @@ public:
          * Overwritten operator --. Moves backword by one
          * @return iterator
          */
-        Iterator &operator--(int) {
+        const Iterator<K, I> operator--(int) {
             if (!it) return *this;
             else {
+                Node *p;
                 auto *temporary = new Iterator(it);
-                it = it->prev;
+                if (it == nullptr) {
+                    while (it->right != nullptr) {
+                        it = it->right;
+                    }
+                } else if (it->left != nullptr) {
+                    it = it->left;
+
+                    while (it->right != nullptr) {
+                        it = it->right;
+                    }
+                } else {
+                    p = it->parent;
+                    while (p != nullptr && it == p->left) {
+                        it = p;
+                        p = p->parent;
+                    }
+                    it = p;
+                }
                 return *temporary;
             }
         }
@@ -500,7 +530,7 @@ public:
      * returns iterator to last element
      * @return iterator to last element
      */
-    TreeIterator last() { return !root ? TreeIterator(nullptr) : TreeIterator(findMax(root)); }
+    TreeIterator last() { return root ? TreeIterator(findMax(root)) : TreeIterator(nullptr); }
 
     /**
      * Searches for iterator with given value
@@ -577,5 +607,17 @@ public:
         print(root, 1);
     }
 
+    /**
+     * Overwritten operator[]
+     * @param key key of element we are looking for
+     * @return value of given element
+     */
+    t2 operator[](t1 key) {
+        if (search(key) == nullptr) {
+            throw std::invalid_argument("Tree does not have such key");
+        }
+        t2 val = search(key)->value;
+        return val;
+    }
 
 };

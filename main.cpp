@@ -2,6 +2,7 @@
 // Created by Michał Nowaliński on 19.10.2018.
 //
 
+
 #include <iostream>
 #include <string>
 #include <map>
@@ -72,23 +73,41 @@ int main() {
     tree->insert(8, "irys");
     tree->insert(9, "jablko");
     tree->insert(10, "koper");
-
-
-
-
+    tree->remove(10);
 
     tree->print();
 
     AVLTree<int, string>::TreeIterator it1 = tree->begin();
-//    AVLTree<int, string>::TreeIterator it2 = tree->end();
-//    AVLTree<int, string>::TreeIterator it3 = tree->last();
-    it1++;
-    it1++;
-    it1++;
-    it1++;
+    AVLTree<int, string>::TreeIterator it2 = tree->last();
+
+
+    for (AVLTree<int, string>::TreeIterator it = tree->last(); it != tree->end(); it--) {
+        cout<<it->key<<"    "<<it->value<<endl;
+    }
 
 
     int cos = 900;
+
+    auto *treeNew = new AVLTree<string, string>();
+    treeNew->insert("1", "arbuz");
+    treeNew->insert("2", "banan");
+    treeNew->insert("3", "cytryna");
+    treeNew->insert("4", "dynia");
+    treeNew->insert("5", "emu");
+    treeNew->insert("6", "fasola");
+    treeNew->insert("7", "groszek");
+    treeNew->insert("8", "irys");
+    treeNew->insert("9", "jablko");
+
+    cout<<(*treeNew)["1"]<<endl;
+    cout<<(*treeNew)["2"]<<endl;
+    cout<<(*treeNew)["3"]<<endl;
+    cout<<(*treeNew)["4"]<<endl;
+    cout<<(*treeNew)["5"]<<endl;
+    cout<<(*treeNew)["6"]<<endl;
+    cout<<(*treeNew)["7"]<<endl;
+    cout<<(*treeNew)["8"]<<endl;
+    cout<<(*treeNew)["9"]<<endl;
 
     return 0;
 }
